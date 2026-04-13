@@ -3,80 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repositório Dinâmico | João Gabriel</title>
+    <title>Slides | João Gabriel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #61afef; --bg: #282c34; --card: #353b45; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 30px; }
-        .card { background: var(--card); padding: 20px; border-radius: 12px; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1); }
-        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
-        .card h3 { margin: 0 0 10px 0; font-size: 1rem; color: var(--primary); word-break: break-all; }
-        
-        /* Modal para o Slide */
-        #viewer-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; }
-        iframe { width: 100%; height: 100%; border: none; }
-        .close-btn { position: absolute; top: 20px; right: 20px; background: red; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; z-index: 1001; }
+        :root {
+            --primary: #6366f1;
+            --bg: #0b0e14;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0b0e14 70%);
+            color: #f8fafc;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        header { padding: 4rem 2rem; text-align: center; }
+        header h1 { font-size: 2.2rem; font-weight: 600; letter-spacing: -1px; margin: 0; }
+        header p { color: #64748b; margin-top: 8px; }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem 5rem; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Card sem imagem, focado no título */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 1.4;
+            color: #f1f5f9;
+            text-transform: capitalize;
+        }
+
+        .card-footer {
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Visualizador */
+        #viewer-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.96);
+            z-index: 1000;
+            padding: 1.5rem;
+        }
+
+        #pdf-iframe { width: 100%; height: 100%; border: none; border-radius: 8px; }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            background: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 1001;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>📚 Meus Slides</h1>
-    <p>Os arquivos abaixo são carregados automaticamente da pasta <code>/slides</code></p>
-    <div id="file-grid" class="grid">Carregando apresentações...</div>
-</div>
+    <header>
+        <h1>Repositório de Slides</h1>
+        <p>João Gabriel • Ceará</p>
+    </header>
 
-<div id="viewer-modal">
-    <button class="close-btn" onclick="closeViewer()">FECHAR [X]</button>
-    <iframe id="slide-iframe" allowfullscreen="true"></iframe>
-</div>
+    <div class="container">
+        <div id="file-grid" class="grid">Carregando...</div>
+    </div>
 
-<script>
-    const USER = 'codedbyjoaogabriel';
-    const REPO = 'repository';
-    const FOLDER = 'slides';
+    <div id="viewer-modal">
+        <button class="close-btn" onclick="closeViewer()">FECHAR</button>
+        <iframe id="pdf-iframe"></iframe>
+    </div>
 
-    // 1. Busca os arquivos na API do GitHub
-    async function loadFiles() {
-        const url = `https://api.github.com/repos/${USER}/${REPO}/contents/${FOLDER}`;
-        
-        try {
-            const response = await fetch(url);
-            const files = await response.json();
+    <script>
+        const USER = 'codedbyjoaogabriel';
+        const REPO = 'repository';
+        const FOLDER = 'slides';
+
+        async function loadFiles() {
             const grid = document.getElementById('file-grid');
-            grid.innerHTML = '';
+            try {
+                const response = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/${FOLDER}`);
+                const files = await response.json();
+                
+                grid.innerHTML = '';
+                // Filtra PDF ou PPTX
+                const validFiles = files.filter(f => f.name.endsWith('.pdf') || f.name.endsWith('.pptx'));
 
-            files.forEach(file => {
-                if (file.name.endsWith('.pptx') || file.name.endsWith('.pdf')) {
+                validFiles.forEach(file => {
+                    const isPdf = file.name.endsWith('.pdf');
+                    const cleanName = file.name.replace('.pdf', '').replace('.pptx', '').replace(/-/g, ' ');
+                    const fileUrl = `https://${USER}.github.io/${REPO}/${FOLDER}/${encodeURIComponent(file.name)}`;
+                    
+                    // Se for PPTX, usa o visualizador da Microsoft, se for PDF abre direto (melhor qualidade)
+                    const finalUrl = isPdf ? fileUrl : `https://view.officeapps.live.com/op/embed.aspx?src=${fileUrl}`;
+
                     const card = document.createElement('div');
                     card.className = 'card';
-                    card.innerHTML = `<h3>${file.name.replace(/%20/g, ' ')}</h3><small>Clique para visualizar</small>`;
-                    card.onclick = () => openViewer(file.name);
+                    card.innerHTML = `
+                        <div>
+                            <div class="card-icon">${isPdf ? '📄' : '📊'}</div>
+                            <h3>${cleanName}</h3>
+                        </div>
+                        <div class="card-footer">${isPdf ? 'Visualizar PDF' : 'Abrir PowerPoint'}</div>
+                    `;
+                    
+                    card.onclick = () => {
+                        document.getElementById('pdf-iframe').src = finalUrl;
+                        document.getElementById('viewer-modal').style.display = 'block';
+                        document.body.style.overflow = 'hidden';
+                    };
                     grid.appendChild(card);
-                }
-            });
-        } catch (e) {
-            document.getElementById('file-grid').innerHTML = 'Erro ao carregar arquivos. Verifique se a pasta /slides existe.';
+                });
+            } catch (e) {
+                grid.innerHTML = '<p>Erro: Certifique-se de que a pasta "/slides" existe.</p>';
+            }
         }
-    }
 
-    function openViewer(fileName) {
-        const modal = document.getElementById('viewer-modal');
-        const iframe = document.getElementById('slide-iframe');
-        // URL de visualização dinâmica
-        const fileUrl = `https://${USER}.github.io/${REPO}/${FOLDER}/${encodeURIComponent(fileName)}`;
-        iframe.src = `https://view.officeapps.live.com/op/embed.aspx?src=${fileUrl}`;
-        modal.style.display = 'block';
-    }
+        function closeViewer() {
+            document.getElementById('viewer-modal').style.display = 'none';
+            document.getElementById('pdf-iframe').src = '';
+            document.body.style.overflow = 'auto';
+        }
 
-    function closeViewer() {
-        document.getElementById('viewer-modal').style.display = 'none';
-        document.getElementById('slide-iframe').src = '';
-    }
-
-    loadFiles();
-</script>
-
+        window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeViewer(); });
+        loadFiles();
+    </script>
 </body>
 </html>
