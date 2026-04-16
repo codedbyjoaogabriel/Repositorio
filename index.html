@@ -2,11 +2,10 @@
 <html lang="pt-br">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Biblioteca de Slides</title>
+<title>Slides | João Gabriel</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 
@@ -18,80 +17,107 @@
 
 --bg:#0b0b0f;
 --card:#121217;
---hover:#1a1a22;
+--card-hover:#1b1b22;
 --border:#23232d;
 
 --text:#ffffff;
 --sub:#8c8c9a;
 
+--accent:#6366f1;
+
 }
 
-*{box-sizing:border-box;}
+*{
+box-sizing:border-box;
+}
 
 body{
+
 margin:0;
+font-family:'Inter',sans-serif;
 background:var(--bg);
-font-family:Inter,sans-serif;
 color:var(--text);
+
 }
 
 /* HEADER */
 
 header{
+
 text-align:center;
-padding:70px 20px 40px;
+padding:70px 20px 50px;
+
 }
 
 header h1{
-font-size:2.8rem;
+
+font-size:3rem;
 margin:0;
+letter-spacing:-1px;
+
 }
 
+header p{
+
+color:var(--sub);
+margin-top:10px;
+
+}
+
+/* SEARCH */
+
 .search{
+
 max-width:600px;
-margin:30px auto;
+margin:30px auto 0;
+
 }
 
 .search input{
 
 width:100%;
-padding:16px;
-
-border-radius:12px;
-
-border:1px solid var(--border);
+padding:15px 20px;
 
 background:var(--card);
 
-color:white;
+border:1px solid var(--border);
 
+border-radius:12px;
+
+color:white;
 font-size:16px;
+
+outline:none;
 
 }
 
 /* CONTAINER */
 
 .container{
+
 max-width:1400px;
 margin:auto;
 padding:20px;
+
 }
 
 /* SUBJECT */
 
 .subject{
-margin-top:70px;
+
+margin-top:80px;
+
 }
 
 .subject h2{
 
-margin-bottom:25px;
+font-size:1.6rem;
 
-font-size:1.5rem;
+margin-bottom:30px;
 
-border-bottom:1px solid var(--border);
-
-padding-bottom:10px;
+display:flex;
+align-items:center;
+gap:10px;
 
 }
 
@@ -101,8 +127,7 @@ padding-bottom:10px;
 
 display:grid;
 
-grid-template-columns:
-repeat(auto-fill,minmax(330px,1fr));
+grid-template-columns:repeat(auto-fill,minmax(360px,1fr));
 
 gap:30px;
 
@@ -114,29 +139,33 @@ gap:30px;
 
 background:var(--card);
 
+border:1px solid var(--border);
+
 border-radius:16px;
 
 overflow:hidden;
 
-border:1px solid var(--border);
-
 cursor:pointer;
 
-transition:0.25s;
+transition:0.35s;
 
 }
 
 .card:hover{
 
-transform:translateY(-5px);
+transform:translateY(-6px);
 
-background:var(--hover);
+background:var(--card-hover);
+
+box-shadow:0 20px 40px rgba(0,0,0,0.6);
+
+border-color:var(--accent);
 
 }
 
 /* CANVAS */
 
-.canvas{
+.canvas-container{
 
 aspect-ratio:16/9;
 
@@ -152,33 +181,43 @@ position:relative;
 
 }
 
+canvas{
+
+width:100%;
+
+height:100%;
+
+}
+
 .loader{
 
 position:absolute;
 
 font-size:12px;
 
-color:#888;
+color:#555;
 
 }
 
-canvas{
-width:100%;
-height:100%;
+/* CARD INFO */
+
+.card-info{
+
+padding:20px;
+
 }
 
-/* INFO */
+.card-info h3{
 
-.info{
-padding:18px;
-}
-
-.info h3{
 margin:0;
-font-size:1.1rem;
+
+font-size:1.2rem;
+
+font-weight:500;
+
 }
 
-.info span{
+.card-info span{
 
 color:var(--sub);
 
@@ -188,7 +227,7 @@ font-size:13px;
 
 /* VIEWER */
 
-#viewer{
+#viewer-modal{
 
 display:none;
 
@@ -202,7 +241,7 @@ z-index:1000;
 
 }
 
-#viewer iframe{
+iframe{
 
 width:100%;
 
@@ -214,24 +253,38 @@ background:white;
 
 }
 
-/* CLOSE */
+/* CLOSE BUTTON */
 
-.close{
+.close-btn{
 
 position:absolute;
 
-top:20px;
-right:20px;
+top:25px;
 
-background:white;
+right:25px;
+
+background:rgba(255,255,255,0.9);
+
+color:black;
 
 border:none;
 
-padding:10px 20px;
+padding:10px 22px;
 
-border-radius:25px;
+border-radius:30px;
+
+font-weight:600;
 
 cursor:pointer;
+
+z-index:1001;
+
+}
+
+.close-btn:hover{
+
+background:#ef4444;
+color:white;
 
 }
 
@@ -241,9 +294,21 @@ footer{
 
 text-align:center;
 
-padding:50px;
+padding:60px 20px;
 
 color:var(--sub);
+
+font-size:14px;
+
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+header h1{
+font-size:2rem;
+}
 
 }
 
@@ -255,7 +320,9 @@ color:var(--sub);
 
 <header>
 
-<h1>Biblioteca de Slides</h1>
+<h1>📚 Biblioteca de Slides</h1>
+
+<p>Organizados por matéria</p>
 
 <div class="search">
 <input id="search" placeholder="Pesquisar slides...">
@@ -265,53 +332,42 @@ color:var(--sub);
 
 <div class="container" id="subjects"></div>
 
-<div id="viewer">
+<div id="viewer-modal">
 
-<button class="close" onclick="closeViewer()">Fechar</button>
+<button class="close-btn" onclick="closeViewer()">FECHAR</button>
 
-<iframe id="frame"></iframe>
+<iframe id="pdf-frame"></iframe>
 
 </div>
 
+<br/>
+
 <footer>
 
-Repositório de Estudos
+João Gabriel • Repositório de Estudos
 
 </footer>
 
 <script>
 
-const USER="codedbyjoaogabriel"
-const REPO="repository"
-const ROOT="slides"
+const USER='codedbyjoaogabriel'
+const REPO='repository'
+const ROOT='slides'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc=
-"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js"
-
-/* formatar nomes */
-
-function formatName(name){
-
-return name
-.replace(".pdf","")
-.replace(/[-_]/g," ")
-.replace(/\b\w/g,l=>l.toUpperCase())
-
-}
-
-/* carregar materias */
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js'
 
 async function loadSubjects(){
 
-const res=await fetch(
-`https://api.github.com/repos/${USER}/${REPO}/contents/${ROOT}`
-)
+const container=document.getElementById("subjects")
+
+const res=await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/${ROOT}`)
 
 const folders=await res.json()
 
 for(const folder of folders){
 
-if(folder.type==="dir"){
+if(folder.type!=="dir") continue
 
 createSubject(folder)
 
@@ -319,21 +375,18 @@ createSubject(folder)
 
 }
 
-}
-
-/* criar materia */
-
 async function createSubject(folder){
 
 const container=document.getElementById("subjects")
 
-const title=formatName(folder.name)
-
 const section=document.createElement("div")
+
 section.className="subject"
 
+const title=folder.name.replace(/-/g," ")
+
 section.innerHTML=`
-<h2>${title}</h2>
+<h2>📁 ${title}</h2>
 <div class="grid" id="grid-${folder.name}"></div>
 `
 
@@ -342,32 +395,25 @@ container.appendChild(section)
 const grid=document.getElementById(`grid-${folder.name}`)
 
 const res=await fetch(folder.url)
-
 const files=await res.json()
 
-files
-.filter(f=>f.name.endsWith(".pdf"))
-.forEach(file=>createCard(file,folder.name,title,grid))
+const pdfs=files.filter(f=>f.name.endsWith(".pdf"))
 
-}
+pdfs.forEach(file=>{
 
-/* criar card */
+const clean=file.name.replace(".pdf","").replace(/-/g," ")
 
-function createCard(file,folder,title,grid){
+const url=`https://${USER}.github.io/${REPO}/${ROOT}/${folder.name}/${encodeURIComponent(file.name)}`
 
-const name=formatName(file.name)
-
-const url=
-`https://${USER}.github.io/${REPO}/${ROOT}/${folder}/${encodeURIComponent(file.name)}`
-
-const canvasId=`c-${file.sha}`
+const canvasId=`canvas-${file.sha}`
 
 const card=document.createElement("div")
+
 card.className="card"
 
 card.innerHTML=`
 
-<div class="canvas">
+<div class="canvas-container">
 
 <span class="loader">carregando...</span>
 
@@ -375,39 +421,35 @@ card.innerHTML=`
 
 </div>
 
-<div class="info">
+<div class="card-info">
 
-<h3>${name}</h3>
+<h3>${clean}</h3>
 
-<span>${title}</span>
+<span>${folder.name}</span>
 
 </div>
 
 `
 
-card.onclick=()=>openViewer(url)
+card.onclick=()=>openPDF(url)
 
 grid.appendChild(card)
 
 generateThumbnail(url,canvasId)
 
+})
+
 }
 
-/* thumbnail */
-
-async function generateThumbnail(url,id){
-
-try{
+async function generateThumbnail(url,canvasId){
 
 const pdf=await pdfjsLib.getDocument(url).promise
-
 const page=await pdf.getPage(1)
 
-const canvas=document.getElementById(id)
-
+const canvas=document.getElementById(canvasId)
 const ctx=canvas.getContext("2d")
 
-const viewport=page.getViewport({scale:1.4})
+const viewport=page.getViewport({scale:1.5})
 
 canvas.width=viewport.width
 canvas.height=viewport.height
@@ -417,74 +459,64 @@ canvasContext:ctx,
 viewport
 }).promise
 
-canvas.parentElement.querySelector(".loader").remove()
-
-}catch(e){
-
-console.log("erro thumbnail",e)
+canvas.parentElement.querySelector(".loader").style.display="none"
 
 }
 
-}
+function openPDF(url){
 
-/* viewer */
+const frame=document.getElementById("pdf-frame")
 
-function openViewer(url){
+frame.src=url+"#toolbar=0&view=FitH"
 
-const viewer=document.getElementById("viewer")
+const modal=document.getElementById("viewer-modal")
 
-document.getElementById("frame").src=url+"#toolbar=0"
-
-viewer.style.display="block"
+modal.style.display="block"
 
 document.body.style.overflow="hidden"
+
+if(modal.requestFullscreen){
+
+modal.requestFullscreen()
+
+}
 
 }
 
 function closeViewer(){
 
-document.getElementById("viewer").style.display="none"
+const modal=document.getElementById("viewer-modal")
 
-document.getElementById("frame").src=""
+modal.style.display="none"
+
+document.getElementById("pdf-frame").src=""
 
 document.body.style.overflow="auto"
 
+if(document.fullscreenElement){
+
+document.exitFullscreen()
+
 }
 
-/* busca */
+}
 
-document.getElementById("search")
-.addEventListener("input",e=>{
+document.getElementById("search").addEventListener("input",e=>{
 
 const term=e.target.value.toLowerCase()
 
-document.querySelectorAll(".card")
-.forEach(card=>{
+document.querySelectorAll(".card").forEach(card=>{
 
-card.style.display=
-card.innerText.toLowerCase().includes(term)
-?"block":"none"
+const text=card.innerText.toLowerCase()
 
-})
+card.style.display=text.includes(term)?"block":"none"
 
 })
 
-/* atalhos */
+})
 
 window.addEventListener("keydown",e=>{
-
 if(e.key==="Escape") closeViewer()
-
-if(e.key==="f"){
-
-const viewer=document.getElementById("viewer")
-
-if(viewer.requestFullscreen){
-viewer.requestFullscreen()
-}
-
-}
-
 })
 
 loadSubjects()
