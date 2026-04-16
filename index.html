@@ -4,54 +4,492 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Biblioteca de Slides</title>
 
-<meta http-equiv="Content-Security-Policy"
-content="
-default-src 'self';
-script-src 'self' https://cdnjs.cloudflare.com;
-style-src 'self' https://fonts.googleapis.com 'unsafe-inline';
-font-src https://fonts.gstatic.com;
-connect-src https://api.github.com;
-frame-src https://*.github.io;
-">
-
-<link rel="stylesheet" href="css/style.css">
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+
+--bg:#0b0b0f;
+--card:#121217;
+--hover:#1a1a22;
+--border:#23232d;
+
+--text:#ffffff;
+--sub:#8c8c9a;
+
+}
+
+*{box-sizing:border-box;}
+
+body{
+margin:0;
+background:var(--bg);
+font-family:Inter,sans-serif;
+color:var(--text);
+}
+
+/* HEADER */
+
+header{
+text-align:center;
+padding:70px 20px 40px;
+}
+
+header h1{
+font-size:2.8rem;
+margin:0;
+}
+
+.search{
+max-width:600px;
+margin:30px auto;
+}
+
+.search input{
+
+width:100%;
+padding:16px;
+
+border-radius:12px;
+
+border:1px solid var(--border);
+
+background:var(--card);
+
+color:white;
+
+font-size:16px;
+
+}
+
+/* CONTAINER */
+
+.container{
+max-width:1400px;
+margin:auto;
+padding:20px;
+}
+
+/* SUBJECT */
+
+.subject{
+margin-top:70px;
+}
+
+.subject h2{
+
+margin-bottom:25px;
+
+font-size:1.5rem;
+
+border-bottom:1px solid var(--border);
+
+padding-bottom:10px;
+
+}
+
+/* GRID */
+
+.grid{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fill,minmax(330px,1fr));
+
+gap:30px;
+
+}
+
+/* CARD */
+
+.card{
+
+background:var(--card);
+
+border-radius:16px;
+
+overflow:hidden;
+
+border:1px solid var(--border);
+
+cursor:pointer;
+
+transition:0.25s;
+
+}
+
+.card:hover{
+
+transform:translateY(-5px);
+
+background:var(--hover);
+
+}
+
+/* CANVAS */
+
+.canvas{
+
+aspect-ratio:16/9;
+
+background:black;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+position:relative;
+
+}
+
+.loader{
+
+position:absolute;
+
+font-size:12px;
+
+color:#888;
+
+}
+
+canvas{
+width:100%;
+height:100%;
+}
+
+/* INFO */
+
+.info{
+padding:18px;
+}
+
+.info h3{
+margin:0;
+font-size:1.1rem;
+}
+
+.info span{
+
+color:var(--sub);
+
+font-size:13px;
+
+}
+
+/* VIEWER */
+
+#viewer{
+
+display:none;
+
+position:fixed;
+
+inset:0;
+
+background:black;
+
+z-index:1000;
+
+}
+
+#viewer iframe{
+
+width:100%;
+
+height:100%;
+
+border:none;
+
+background:white;
+
+}
+
+/* CLOSE */
+
+.close{
+
+position:absolute;
+
+top:20px;
+right:20px;
+
+background:white;
+
+border:none;
+
+padding:10px 20px;
+
+border-radius:25px;
+
+cursor:pointer;
+
+}
+
+/* FOOTER */
+
+footer{
+
+text-align:center;
+
+padding:50px;
+
+color:var(--sub);
+
+}
+
+</style>
 
 </head>
 
 <body>
 
-<header class="hero">
+<header>
 
 <h1>Biblioteca de Slides</h1>
 
-<input
-id="search"
-placeholder="Pesquisar matéria ou slide..."
-autocomplete="off"
-/>
+<div class="search">
+<input id="search" placeholder="Pesquisar slides...">
+</div>
 
 </header>
 
-<main id="subjects"></main>
+<div class="container" id="subjects"></div>
 
 <div id="viewer">
 
-<button id="close">Fechar</button>
+<button class="close" onclick="closeViewer()">Fechar</button>
 
 <iframe id="frame"></iframe>
 
 </div>
 
-<script src="js/github-api.js"></script>
-<script src="js/app.js"></script>
-<script src="js/viewer.js"></script>
-<script src="js/search.js"></script>
+<footer>
+
+Repositório de Estudos
+
+</footer>
+
+<script>
+
+const USER="codedbyjoaogabriel"
+const REPO="repository"
+const ROOT="slides"
+
+pdfjsLib.GlobalWorkerOptions.workerSrc=
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js"
+
+/* formatar nomes */
+
+function formatName(name){
+
+return name
+.replace(".pdf","")
+.replace(/[-_]/g," ")
+.replace(/\b\w/g,l=>l.toUpperCase())
+
+}
+
+/* carregar materias */
+
+async function loadSubjects(){
+
+const res=await fetch(
+`https://api.github.com/repos/${USER}/${REPO}/contents/${ROOT}`
+)
+
+const folders=await res.json()
+
+for(const folder of folders){
+
+if(folder.type==="dir"){
+
+createSubject(folder)
+
+}
+
+}
+
+}
+
+/* criar materia */
+
+async function createSubject(folder){
+
+const container=document.getElementById("subjects")
+
+const title=formatName(folder.name)
+
+const section=document.createElement("div")
+section.className="subject"
+
+section.innerHTML=`
+<h2>${title}</h2>
+<div class="grid" id="grid-${folder.name}"></div>
+`
+
+container.appendChild(section)
+
+const grid=document.getElementById(`grid-${folder.name}`)
+
+const res=await fetch(folder.url)
+
+const files=await res.json()
+
+files
+.filter(f=>f.name.endsWith(".pdf"))
+.forEach(file=>createCard(file,folder.name,title,grid))
+
+}
+
+/* criar card */
+
+function createCard(file,folder,title,grid){
+
+const name=formatName(file.name)
+
+const url=
+`https://${USER}.github.io/${REPO}/${ROOT}/${folder}/${encodeURIComponent(file.name)}`
+
+const canvasId=`c-${file.sha}`
+
+const card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+
+<div class="canvas">
+
+<span class="loader">carregando...</span>
+
+<canvas id="${canvasId}"></canvas>
+
+</div>
+
+<div class="info">
+
+<h3>${name}</h3>
+
+<span>${title}</span>
+
+</div>
+
+`
+
+card.onclick=()=>openViewer(url)
+
+grid.appendChild(card)
+
+generateThumbnail(url,canvasId)
+
+}
+
+/* thumbnail */
+
+async function generateThumbnail(url,id){
+
+try{
+
+const pdf=await pdfjsLib.getDocument(url).promise
+
+const page=await pdf.getPage(1)
+
+const canvas=document.getElementById(id)
+
+const ctx=canvas.getContext("2d")
+
+const viewport=page.getViewport({scale:1.4})
+
+canvas.width=viewport.width
+canvas.height=viewport.height
+
+await page.render({
+canvasContext:ctx,
+viewport
+}).promise
+
+canvas.parentElement.querySelector(".loader").remove()
+
+}catch(e){
+
+console.log("erro thumbnail",e)
+
+}
+
+}
+
+/* viewer */
+
+function openViewer(url){
+
+const viewer=document.getElementById("viewer")
+
+document.getElementById("frame").src=url+"#toolbar=0"
+
+viewer.style.display="block"
+
+document.body.style.overflow="hidden"
+
+}
+
+function closeViewer(){
+
+document.getElementById("viewer").style.display="none"
+
+document.getElementById("frame").src=""
+
+document.body.style.overflow="auto"
+
+}
+
+/* busca */
+
+document.getElementById("search")
+.addEventListener("input",e=>{
+
+const term=e.target.value.toLowerCase()
+
+document.querySelectorAll(".card")
+.forEach(card=>{
+
+card.style.display=
+card.innerText.toLowerCase().includes(term)
+?"block":"none"
+
+})
+
+})
+
+/* atalhos */
+
+window.addEventListener("keydown",e=>{
+
+if(e.key==="Escape") closeViewer()
+
+if(e.key==="f"){
+
+const viewer=document.getElementById("viewer")
+
+if(viewer.requestFullscreen){
+viewer.requestFullscreen()
+}
+
+}
+
+})
+
+loadSubjects()
+
+</script>
 
 </body>
 </html>
